@@ -10,10 +10,10 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 const pusher = new Pusher({
-    appId: '1747785',
-    key: '948afcd58f98d595819d',
-    secret: '6658434f8d25f92596db',
-    cluster: 'ap2',
+    appId: process.env.PUSHER_APP_ID,
+    key: process.env.PUSHER_APP_KEY,
+    secret: process.env.PUSHER_APP_SECRET,
+    cluster: process.env.PUSHER_APP_CLUSTER,
 })
 
 app.post('/offer', (req, res) => {
