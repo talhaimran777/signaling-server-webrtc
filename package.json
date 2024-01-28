@@ -10,12 +10,9 @@
   "author": "Talha Imran",
   "license": "MIT",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.18.2",
-    "socket.io": "^4.7.4"
-  },
-  "optionalDependencies": {
-    "bufferutil": "^4.0.8",
-    "utf-8-validate": "^5.0.10"
+    "pusher": "^5.2.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
