@@ -1,45 +1,36 @@
-import bodyParser from 'body-parser'
-import cors from 'cors'
 import express from 'express'
-import Pusher from 'pusher'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
 
 const app = express()
-
-app.use(cors())
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
-
-const pusher = new Pusher({
-    appId: process.env.PUSHER_APP_ID,
-    key: process.env.PUSHER_APP_KEY,
-    secret: process.env.PUSHER_APP_SECRET,
-    cluster: process.env.PUSHER_APP_CLUSTER,
+const httpServer = createServer(app)
+const io = new Server(httpServer, {
+    cors: {
+        origin: '*',
+    },
 })
 
-app.post('/offer', (req, res) => {
-    console.log('Offer Received', req.body.offer)
-    pusher.trigger('web-rtc-channel', 'offer', {
-        message: req.body.offer,
+io.on('connection', (socket) => {
+    console.log(`A new user connected with socket ID: ${socket.id}`)
+
+    socket.on('offer', (offer) => {
+        console.log('Offer received on server: ', offer)
+        socket.broadcast.emit('offer', offer)
     })
-    res.sendStatus(200)
-})
 
-app.post('/answer', (req, res) => {
-    pusher.trigger('web-rtc-channel', 'answer', {
-        message: req.body.answer,
+    socket.on('answer', (answer) => {
+        console.log('Answer received on server: ', answer)
+        socket.broadcast.emit('answer', answer)
     })
-    res.sendStatus(200)
-})
 
-app.post('/ice-candidate', (req, res) => {
-    pusher.trigger('web-rtc-channel', 'ice-candidate', {
-        message: req.body.iceCandidate,
+    socket.on('ice-candidate', (iceCandidate) => {
+        console.log('Ice candidate received on server: ', iceCandidate)
+        socket.broadcast.emit('ice-candidate', iceCandidate)
     })
-    res.sendStatus(200)
 })
 
-const PORT = process.env.PORT || 8000
+const port = process.env.PORT || 8000
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`)
+httpServer.listen(port, () => {
+    console.log(`Server started on port ${port}`)
 })
