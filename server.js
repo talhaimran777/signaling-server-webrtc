@@ -51,9 +51,17 @@ io.on('connection', (socket) => {
     socket.on('join-meet-link', (meetLink) => {
         console.log('Join meet link received on server: ', meetLink)
 
-        socket.join(meetLink)
+        const maxUsersPerRoom = process.env.MAX_USERS_PER_ROOM || 3
 
         const users = roomUsers.get(meetLink) || []
+
+        if (users.length >= maxUsersPerRoom) {
+            io.to(socket.id).emit('room-full', meetLink)
+            return
+        }
+
+        socket.join(meetLink)
+
         users.push(socket.id)
         roomUsers.set(meetLink, [...new Set(users)])
 
